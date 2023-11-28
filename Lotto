@@ -1,1 +1,102 @@
-test123234234
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
+
+public class LottoGen {
+    public static void main(String[] args) {
+        
+        // 로또 매수 입력 받기
+        Scanner sc = new Scanner(System.in);
+        int n = Quantity(sc);
+
+        // 중복 없는 로또 번호 생성
+        Set<String> lottoNums = genLottoNums(n);
+
+        // 생성된 로또 번호를 파일에 저장
+        String genFilePath = "C:/Users/JH/Desktop/myfile/testjava/LottoNumbers.txt"; // 저장 경로 지정
+        saveToFile(genFilePath, lottoNums);
+        System.out.println("로또 번호 " + genFilePath + "에 저장");
+
+        // 로또 번호 파일 입력 받기
+        String specFilePath = "C:/Users/JH/Desktop/myfile/testjava/LottoNumbers.txt"; // 저장 경로 지정
+        Map<Integer, String> specLottoNums = readFromFile(specFilePath);
+
+        // 입력 받은 로또 번호(순서 번호 포함) 실시간 출력 확인
+        System.out.println("로또 번호:");
+        for (Map.Entry<Integer, String> entry : specLottoNums.entrySet()) {
+            System.out.println(entry.getValue());
+        }
+    }
+    // 로또 매수에 관한 것
+    private static int Quantity(Scanner sc) {
+        while (true) {
+            try {
+                System.out.print("로또 매수를 입력할 것 (최소 1장 이상): ");
+                int n = Integer.parseInt(sc.nextLine()); // 숫자는 1이상 받도록 설정
+                if (n >= 1) {
+                    return n;
+                } else {
+                    System.out.println("최소 1장 이상을 입력할 것");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("올바른 숫자를 입력할 것");
+            }
+        }
+    }
+    // 로또 번호 생성기
+    private static Set<String> genLottoNums(int n) {
+        Set<String> lottoNums = new HashSet<>(); // hashset으로 로또 번호 정렬
+
+        Random rand = new Random(); // 난수 생성
+        for (int i = 0; i < n; i++) {  // 로또 번호를 n 개 생성
+            StringBuilder lottoTicket = new StringBuilder(); // 문자열을 동적으로 빌드함
+            Set<Integer> uniqueNums = new HashSet<>();  // 중복된 번호 생성 방지(고유한 번호만 생성)
+	    
+	    //1부터 45까지의 1개의 난수를 생성하고 총 6번 반복
+            while (uniqueNums.size() < 6) {   
+                int randNum = rand.nextInt(45) + 1;
+                uniqueNums.add(randNum);  // 중복되지 않은 로또 번호 생성
+            }
+	    // 생성된 난수마다 “,”를 추가
+            for (int num : uniqueNums) {
+                lottoTicket.append(num).append(", ");  // 로또 번호를 “,”로 구분함
+            }
+
+            // 마지막에 추가된 ", " 제거
+            lottoTicket.delete(ticket.length() - 2, lottoTicket.length());  // 마지막에 생성되는 “,” 제거
+
+            lottoNums.add(lottoTicket.toString()); // 한 번의 반복에서 생성된 로또 번호 1개씩을 리스트에 추가
+        }
+
+        return lottoNums; // 로또 번호 생성 완료
+    }
+
+    // 생성된 로또 번호를 파일에 저장
+    private static void saveToFile(String filePath, Set<String> lottoNums) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            int count = 1; // 첫 번째 번호를 의미
+            for (String num : lottoNums) {
+                writer.write(count + "번째 : " + num + "\n"); // 로또 번호 출력
+                count++; // 순서를 계산하기 위해 count값 1씩 증가
+            }
+        } catch (IOException e) {
+            System.err.println("파일 저장 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    // 로또 번호 파일 입력 결과물 출력
+    private static Map<Integer, String> readFromFile(String filePath) { 
+        Map<Integer, String> lottoNums = new HashMap<>();  //Integer -> count 값, String -> 로또 번호
+        try (Scanner scanner = new Scanner(new File(filePath))) {
+            int count = 1; // 첫 번째 번호를 의미
+            while (scanner.hasNextLine()) {
+                lottoNums.put(count, scanner.nextLine()); // 생성한 로또 번호를 파일에 순서대로 값 입력
+                count++; // 순서를 계산하기 위해 count값 1씩 증가
+            }
+        } catch (IOException e) {
+            System.err.println("파일 읽기 중 오류 발생: " + e.getMessage());
+        }
+        return lottoNums;
+    }
+}
